@@ -1,16 +1,22 @@
 class AgGridCustom extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `<div>Hello, AG Grid!</div>`;
+        this.attachShadow({ mode: "open" });
 
-        this.gridDiv = document.createElement('div');
-        this.gridDiv.style.height = "300px";
+        this.gridDiv = document.createElement("div");
+        this.gridDiv.id = "myGrid";
+        this.gridDiv.style.height = "400px";
         this.gridDiv.style.width = "100%";
         this.shadowRoot.appendChild(this.gridDiv);
+    }
 
-        // Grid Options
-        this.gridOptions = {
+    connectedCallback() {
+        if (!window.agGrid || !window.agGrid.createGrid) {
+            console.error("AG Grid is not loaded!");
+            return;
+        }
+
+        const gridOptions = {
             rowData: [
                 { make: "Tesla", model: "Model Y", price: 64950, electric: true },
                 { make: "Ford", model: "F-Series", price: 33850, electric: false },
@@ -25,23 +31,11 @@ class AgGridCustom extends HTMLElement {
                 { field: "price" },
                 { field: "electric" },
             ],
-            defaultColDef: {
-                flex: 1,
-            },
+            defaultColDef: { flex: 1 },
         };
-    }
 
-    connectedCallback() {
-        if (!window.agGrid || !window.agGrid.createGrid) {
-            console.error("AG Grid is not loaded!");
-            return;
-        }
-
-        this.gridApi = window.agGrid.createGrid(this.gridDiv, this.gridOptions);
-    }
-
-    render() {
-        this.gridDiv.innerHTML = "<h3>AG Grid Custom Widget</h3>";
+        this.gridApi = window.agGrid.createGrid(this.gridDiv, gridOptions);
     }
 }
-customElements.define('ag-grid-custom', AgGridCustom);
+
+customElements.define("ag-grid-custom", AgGridCustom);
