@@ -7,7 +7,11 @@ class AgGridCustom extends HTMLElement {
         this.gridDiv.id = "myGrid"; // ID для создания Grid
         this.gridDiv.style.height = "300px";
         this.gridDiv.style.width = "100%";
+
         this.shadowRoot.appendChild(this.gridDiv);
+
+        // Указатель на grid API
+        this.gridApi = null;
     }
 
     setData(data) {
@@ -16,17 +20,15 @@ class AgGridCustom extends HTMLElement {
             return;
         }
 
+        // Если Grid уже создан, обновляем данные, а не пересоздаем
+        if (this.gridApi) {
+            this.gridApi.setGridOption('rowData', data);
+            return;
+        }
+
+        // Настройки AG Grid
         const gridOptions = {
-            // Data to be displayed
-            rowData: [
-                { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-                { make: "Ford", model: "F-Series", price: 33850, electric: false },
-                { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-                { make: "Mercedes", model: "EQA", price: 48890, electric: true },
-                { make: "Fiat", model: "500", price: 15774, electric: false },
-                { make: "Nissan", model: "Juke", price: 20675, electric: false },
-            ],
-            // Columns to be displayed (Should match rowData properties)
+            rowData: data, // Используем переданный data
             columnDefs: [
                 { field: "make" },
                 { field: "model" },
@@ -38,15 +40,20 @@ class AgGridCustom extends HTMLElement {
             },
         };
 
+        // Создаем AG Grid
         this.gridApi = agGrid.createGrid(this.gridDiv, gridOptions);
     }
 
     connectedCallback() {
-        this.render();
-    }
-
-    render() {
-        this.gridDiv.innerHTML = "<h3>AG Grid Custom Widget</h3>";
+        // Автоматически загружаем тестовые данные
+        this.setData([
+            { make: "Tesla", model: "Model Y", price: 64950, electric: true },
+            { make: "Ford", model: "F-Series", price: 33850, electric: false },
+            { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+            { make: "Mercedes", model: "EQA", price: 48890, electric: true },
+            { make: "Fiat", model: "500", price: 15774, electric: false },
+            { make: "Nissan", model: "Juke", price: 20675, electric: false },
+        ]);
     }
 }
 
