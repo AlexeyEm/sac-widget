@@ -3,73 +3,70 @@ class TabulatorCustom extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
 
-        // Создаём контейнер для таблицы
-        this.gridDiv = document.createElement('div');
-        this.gridDiv.style.height = "400px";
-        this.gridDiv.style.width = "100%";
-        this.shadowRoot.appendChild(this.gridDiv);
+        // Создаем контейнер для таблицы
+        this.tableContainer = document.createElement('div');
+        this.shadowRoot.appendChild(this.tableContainer);
 
-        // Инициализируем пустую таблицу
-        this.table = null;
-        this.data = [];
+        this.table = null; // Таблица будет создана позже
     }
 
-    async connectedCallback() {
-        // Загружаем Tabulator, если он ещё не загружен
+    connectedCallback() {
+        this.loadTabulator();
+    }
+
+    async loadTabulator() {
         if (!window.Tabulator) {
-            await this.loadScript("https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.4.4/js/tabulator.min.js");
+            // Загружаем библиотеку Tabulator, если она не загружена
+            await this.loadScript("https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js");
         }
-        this.initGrid();
+
+        this.initTable();
     }
 
-    // Функция для загрузки JS-библиотеки
-    loadScript(url) {
+    loadScript(src) {
         return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = url;
+            const script = document.createElement("script");
+            script.src = src;
             script.onload = resolve;
             script.onerror = reject;
             document.head.appendChild(script);
         });
     }
 
-    // Инициализация таблицы
-    initGrid() {
-        this.table = new Tabulator(this.gridDiv, {
-            data: this.data, // Используем текущие данные
+    initTable() {
+        if (!window.Tabulator) {
+            console.error("Tabulator is not loaded!");
+            return;
+        }
+
+        this.table = new Tabulator(this.tableContainer, {
             layout: "fitColumns",
-            columns: [
-                { title: "ID", field: "id", sorter: "number", editor: "input" },
-                { title: "Name", field: "name", sorter: "string", editor: "input" },
-                { title: "Age", field: "age", sorter: "number", editor: "input" }
-            ],
+            columns: [],
+            data: [],
+            autoColumns: true, // Автоматическое создание колонок по данным
             clipboard: "copy",
-            clipboardPasteAction: "replace" // Позволяет вставку из Excel
+            clipboardPasteAction: "replace",
+            selectable: true, // Позволяет выделять строки
+            editable: true, // Редактируемые ячейки
         });
     }
 
-    // Метод SAC: установка данных в таблицу
-    setData(data) {
-        this.data = data;
-        if (this.table) {
-            this.table.setData(this.data);
-        }
-    }
+    setData(dataString) {
+        try {
+            const data = JSON.parse(dataString);
 
-    // Автоматически обновляем данные, если свойство `data` изменяется в SAC
-    static get observedAttributes() {
-        return ["data"];
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name === "data") {
-            try {
-                this.setData(JSON.parse(newValue));
-            } catch (error) {
-                console.error("Ошибка при разборе данных:", error);
+            if (!Array.isArray(data.rows)) {
+                console.error("Invalid data format: expected { rows: [...] }");
+                return;
             }
+
+            if (this.table) {
+                this.table.setData(data.rows); // Обновление данных в таблице
+            }
+        } catch (error) {
+            console.error("Failed to parse data:", error);
         }
     }
 }
 
-customElements.define('tabulator-custom', TabulatorCustom);
+customElements.define("tabulator-custom", TabulatorCustom);
