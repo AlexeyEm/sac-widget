@@ -57,13 +57,6 @@ class TabulatorCustom extends HTMLElement {
             selectable: true, // Позволяет выделять строки
             editable: true, // Редактируемые ячейки
         });
-
-        // Устанавливаем обработчик изменения размеров виджета
-        new ResizeObserver(() => {
-            if (this.table) {
-                this.table.redraw(); // Перерисовка при изменении размеров
-            }
-        }).observe(this.tableContainer);
     }
 
     setData(dataString) {
