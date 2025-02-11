@@ -5,9 +5,11 @@ class TabulatorCustom extends HTMLElement {
 
         // Создаем контейнер для таблицы
         this.tableContainer = document.createElement('div');
+        this.tableContainer.style.width = "100%";
+        this.tableContainer.style.height = "400px"; // Минимальная высота
         this.shadowRoot.appendChild(this.tableContainer);
 
-        this.table = null; // Таблица будет создана позже
+        this.table = null;
     }
 
     connectedCallback() {
@@ -39,6 +41,12 @@ class TabulatorCustom extends HTMLElement {
             return;
         }
 
+        if (!this.tableContainer || !(this.tableContainer instanceof HTMLElement)) {
+            console.error("Tabulator container is not a valid HTML element.");
+            return;
+        }
+
+        // Инициализация таблицы только после проверки наличия контейнера
         this.table = new Tabulator(this.tableContainer, {
             layout: "fitColumns",
             columns: [],
@@ -49,6 +57,13 @@ class TabulatorCustom extends HTMLElement {
             selectable: true, // Позволяет выделять строки
             editable: true, // Редактируемые ячейки
         });
+
+        // Устанавливаем обработчик изменения размеров виджета
+        new ResizeObserver(() => {
+            if (this.table) {
+                this.table.redraw(); // Перерисовка при изменении размеров
+            }
+        }).observe(this.tableContainer);
     }
 
     setData(dataString) {
