@@ -13,6 +13,12 @@ class TabulatorCustom extends HTMLElement {
     }
 
     connectedCallback() {
+        if (!document.querySelector("link[href*='tabulator.min.css']")) {
+            const link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.href = "https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css";
+            document.head.appendChild(link);
+        }
         this.loadTabulator();
     }
 
