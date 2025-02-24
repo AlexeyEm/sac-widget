@@ -33,10 +33,7 @@ Promise.all([
       }
       const spreadsheetDiv = this.shadowRoot.querySelector('#spreadsheet');
       jspreadsheet(spreadsheetDiv, {
-        worksheets: [{
-          data: [['', '']],
-          columns: [{ type: 'text', title: 'Column 1', width: 200 }]
-        }]
+        worksheets: [{ minDimensions:[5,5] }]
       });
     }
   }
