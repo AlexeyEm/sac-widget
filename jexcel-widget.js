@@ -33,7 +33,8 @@ Promise.all([
       }
       const spreadsheetDiv = this.shadowRoot.querySelector('#spreadsheet');
       jspreadsheet(spreadsheetDiv, {
-        worksheets: [{ minDimensions:[5,5] }]
+        worksheets: [{ minDimensions:[5,5] }],
+        editable: true
       });
     }
   }
