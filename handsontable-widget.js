@@ -21,7 +21,7 @@ class HandsontableCustom extends HTMLElement {
             await this.loadScript("https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js");
         }
 
-        export const data = [
+        const data = [
   [
     false,
     'Tagcat',
