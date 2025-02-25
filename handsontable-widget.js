@@ -1303,6 +1303,7 @@ class HandsontableCustom extends HTMLElement {
             manualRowResize: true,
             manualColumnResize: true,
             navigableHeaders: true,
+            licenseKey: 'non-commercial-and-evaluation',
         });
     }
 
